@@ -1,5 +1,7 @@
 #include "Board.h"
 #include <assert.h>
+#include "Snake.h"
+#include "Goal.h"
 
 Board::Board( Graphics& gfx )
 	:
@@ -50,4 +52,70 @@ void Board::DrawBorder()
 	gfx.DrawRect( right - borderWidth,top + borderWidth,right,bottom - borderWidth,borderColor );
 	// bottom
 	gfx.DrawRect( left,bottom - borderWidth,right,bottom,borderColor );
+}
+
+int Board::GetContents(const Location & loc) const
+{
+	return hasContent[ loc.y * width + loc.x ];
+}
+
+void Board::SpawnContent(std::mt19937 rng, const Snake & snek,  int contentType)
+{
+	std::uniform_int_distribution<int> xDist(0, width - 1);
+	std::uniform_int_distribution<int> yDist(0, height - 1);
+
+	Location newLoc;
+	do
+	{
+		newLoc.x = xDist( rng );
+		newLoc.y = yDist( rng );
+	} while (snek.IsInTile( newLoc ) || GetContents( newLoc ) != 0);
+
+	if (contentType == 1)
+	{
+		hasContent[newLoc.y * width + newLoc.x] = 1;
+	} 
+	else if (contentType == 2)
+	{
+		hasContent[newLoc.y * width + newLoc.x] = 2;
+	}
+	else 
+	{
+		hasContent[newLoc.y * width + newLoc.x] = 3;
+	}
+	
+}
+
+void Board::DrawContent()
+{
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			int contentType = GetContents({ j,i });
+			if (contentType != 0)
+			{
+				if (contentType == 1)
+				{
+					DrawCell({ j, i }, obstacleColor);
+				}
+				else if (contentType == 2)
+				{
+					DrawCell({ j, i }, foodColor);
+				}
+				else
+				{
+					DrawCell({ j, i }, poisonColor);
+				}
+			}
+		}
+	}
+}
+
+void Board::ConsumeContent(const Location& loc)
+{
+	const int contentType = GetContents(loc);
+	assert( contentType == 2 || contentType == 3 );
+	
+	hasContent[loc.y * width + loc.x] = 0;
 }
