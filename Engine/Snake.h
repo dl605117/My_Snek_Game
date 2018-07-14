@@ -27,7 +27,7 @@ public:
 	void Draw( Board& brd ) const;
 	bool IsInTileExceptEnd( const Location& target ) const;
 	bool IsInTile( const Location& target ) const;
-
+	int GetLength() const;
 private:
 	static constexpr Color headColor = Colors::Yellow;
 	static constexpr int nBodyColors = 4;
