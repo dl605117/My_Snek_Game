@@ -26,9 +26,12 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	brd( gfx ),
+	brd( settings, gfx ),
 	rng( std::random_device()() ),
-	snek( {2,2} )
+	snek( {2,2} ),
+	nPoison( settings.GetNPoison() ),
+	nFood( settings.GetNGoal() ),
+	snekSpeedupFactor( settings.GetSpeedUpRate() )
 {
 	for( int i = 0; i < nPoison; i++ )
 	{
